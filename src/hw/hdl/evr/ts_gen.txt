@@ -1,0 +1,78 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity ts_gen is
+    port (
+        clk      : in  std_logic;
+        rst      : in  std_logic;
+        start    : in  std_logic; 
+        din      : in  std_logic_vector(31 downto 0);
+        dout     : out std_logic_vector(7 downto 0);
+        dout_val : out std_logic
+
+    );
+end entity;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+
+
+architecture behv of ts_gen is
+
+    type byte_array is array (0 to 31) of std_logic_vector(7 downto 0);
+    signal temp   : byte_array;
+    type state_type is (IDLE, PROCESS, DONE);
+    signal state  : state_type := IDLE;
+    signal start_d : std_logic := '0';  -- for rising edge detection
+    signal idx: integer range 0 to 31
+
+begin
+
+process(clk, rst)
+  begin
+    if rst = '1' then
+      state <= IDLE;
+      start_prev <= '0';
+    elsif rising_edge(clk) then
+      start_prev <= start;
+
+      case state is
+        when IDLE =>
+          if start = '1' and start_prev = '0' then
+            state <= process;
+            idx <= 31;
+          end if;
+
+        when PROCESS =>
+          if din(idx) = '0' then
+            dout <= x"70";
+          else
+            dout <= x"71";
+          end if;
+          state <= wait;
+
+        when WAIT =>
+          if idx = 0 then
+              state <= IDLE;  -- automatically go back to IDLE
+          else
+             idx <= idx - 1;
+             state <= delay;
+          end if;
+          
+        when DELAY => 
+           dlycnt <= dly_cnt + 1;
+           if (dlycnt = 8d"100") then
+             state <= process;
+           end if;
+                
+
+      end case;
+   end if;
+end process;
+
+
+end architecture;
+

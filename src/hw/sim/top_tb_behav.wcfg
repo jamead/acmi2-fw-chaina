@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="top_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="axi_dma_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="bpm_package" />
+            <top_module name="common" />
+            <top_module name="glbl" />
+            <top_module name="lib_pkg" />
+            <top_module name="pkg_pl_regs" />
+            <top_module name="std" />
+            <top_module name="top_tb" />
+            <top_module name="vcomponents" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="29.827142 ns"></ZoomStartTime>
+      <ZoomEndTime time="52.038845 ns"></ZoomEndTime>
+      <Cursor1Time time="33.689158 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="244"></NameColumnWidth>
+      <ValueColumnWidth column_width="82"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="13" />
+   <wvobject type="other" fp_name="/top_tb/dut/SIM_MODE">
+      <obj_property name="ElementShortName">SIM_MODE</obj_property>
+      <obj_property name="ObjectShortName">SIM_MODE</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/top_tb/dut/adc_clk">
+      <obj_property name="ElementShortName">adc_clk</obj_property>
+      <obj_property name="ObjectShortName">adc_clk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/adc_inst/adc_data">
+      <obj_property name="ElementShortName">adc_data[0:3][15:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data[0:3][15:0]</obj_property>
+      <wvobject type="array" fp_name="/top_tb/dut/adc_inst/adc_data[0]">
+         <obj_property name="ElementShortName">[0][15:0]</obj_property>
+         <obj_property name="ObjectShortName">[0][15:0]</obj_property>
+         <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+         <obj_property name="CellHeight">100</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/top_tb/dut/adc_inst/adc_data[1]">
+         <obj_property name="ElementShortName">[1][15:0]</obj_property>
+         <obj_property name="ObjectShortName">[1][15:0]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+         <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+         <obj_property name="CellHeight">100</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/top_tb/dut/adc_inst/adc_data[2]">
+         <obj_property name="ElementShortName">[2][15:0]</obj_property>
+         <obj_property name="ObjectShortName">[2][15:0]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+         <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+         <obj_property name="CellHeight">100</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/top_tb/dut/adc_inst/adc_data[3]">
+         <obj_property name="ElementShortName">[3][15:0]</obj_property>
+         <obj_property name="ObjectShortName">[3][15:0]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+         <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+         <obj_property name="CellHeight">100</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="logic" fp_name="/top_tb/dut/tbt_engine/cha_ddc/tbt_trig">
+      <obj_property name="ElementShortName">tbt_trig</obj_property>
+      <obj_property name="ObjectShortName">tbt_trig</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/tbt_engine/cha_ddc/qraw_sc">
+      <obj_property name="ElementShortName">qraw_sc[23:0]</obj_property>
+      <obj_property name="ObjectShortName">qraw_sc[23:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/tbt_engine/cha_ddc/qfir">
+      <obj_property name="ElementShortName">qfir[23:0]</obj_property>
+      <obj_property name="ObjectShortName">qfir[23:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/top_tb/dut/tbt_engine/cha_ddc/qfilt_tready">
+      <obj_property name="ElementShortName">qfilt_tready</obj_property>
+      <obj_property name="ObjectShortName">qfilt_tready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/top_tb/dut/tbt_engine/cha_ddc/qfilt_tvalid">
+      <obj_property name="ElementShortName">qfilt_tvalid</obj_property>
+      <obj_property name="ObjectShortName">qfilt_tvalid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/tbt_engine/cha_ddc/qfilt_tdata_fp">
+      <obj_property name="ElementShortName">qfilt_tdata_fp[47:0]</obj_property>
+      <obj_property name="ObjectShortName">qfilt_tdata_fp[47:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/tbt_engine/cha_ddc/qfilt_tdata">
+      <obj_property name="ElementShortName">qfilt_tdata[23:0]</obj_property>
+      <obj_property name="ObjectShortName">qfilt_tdata[23:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/tbt_engine/cha_ddc/ifilt_tdata">
+      <obj_property name="ElementShortName">ifilt_tdata[23:0]</obj_property>
+      <obj_property name="ObjectShortName">ifilt_tdata[23:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/tbt_engine/chc_ddc/mag">
+      <obj_property name="ElementShortName">mag[31:0]</obj_property>
+      <obj_property name="ObjectShortName">mag[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="AnalogYRangeMin">8.15289e+06</obj_property>
+      <obj_property name="AnalogYRRangeMax">3.67293e+07</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/dut/tbt_engine/chc_ddc/phs">
+      <obj_property name="ElementShortName">phs[31:0]</obj_property>
+      <obj_property name="ObjectShortName">phs[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+   </wvobject>
+</wave_config>
