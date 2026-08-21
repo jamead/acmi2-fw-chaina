@@ -55,13 +55,13 @@ generic(
 	-- afe power management
 	afe_pwrenb              : out std_logic;
 
-    --evr transceiver
-    gth_evr_refclk_p        : in std_logic;
-    gth_evr_refclk_n        : in std_logic;
-    gth_evr_tx_p            : out std_logic;
-    gth_evr_tx_n            : out std_logic;
-    gth_evr_rx_p            : in std_logic;
-    gth_evr_rx_n            : in std_logic;   
+--    --evr transceiver
+--    gth_evr_refclk_p        : in std_logic;
+--    gth_evr_refclk_n        : in std_logic;
+--    gth_evr_tx_p            : out std_logic;
+--    gth_evr_tx_n            : out std_logic;
+--    gth_evr_rx_p            : in std_logic;
+--    gth_evr_rx_n            : in std_logic;   
     
     -- dfe i/o
     sfp_led                 : out std_logic_vector(11 downto 0);
@@ -331,34 +331,34 @@ reg_i_evr.ts_ns <= evr_ts(31 downto 0);
 
 
 
---embedded event receiver
-evr: entity work.evr_top 
-  generic map (
-    SIM_MODE => SIM_MODE
-  )
-  port map(
-    sys_clk => pl_clk0,
-    sys_rst => pl_reset, 
-    reg_o => reg_o_evr,
-    --gth_reset => gth_reset,
+----embedded event receiver
+--evr: entity work.evr_top 
+--  generic map (
+--    SIM_MODE => SIM_MODE
+--  )
+--  port map(
+--    sys_clk => pl_clk0,
+--    sys_rst => pl_reset, 
+--    reg_o => reg_o_evr,
+--    --gth_reset => gth_reset,
 
-    gth_refclk_p => gth_evr_refclk_p,  -- 312.5 MHz reference clock
-    gth_refclk_n => gth_evr_refclk_n,
-    gth_tx_p => gth_evr_tx_p,
-    gth_tx_n => gth_evr_tx_n,
-    gth_rx_p => gth_evr_rx_p,
-    gth_rx_n => gth_evr_rx_n,
+--    gth_refclk_p => gth_evr_refclk_p,  -- 312.5 MHz reference clock
+--    gth_refclk_n => gth_evr_refclk_n,
+--    gth_tx_p => gth_evr_tx_p,
+--    gth_tx_n => gth_evr_tx_n,
+--    gth_rx_p => gth_evr_rx_p,
+--    gth_rx_n => gth_evr_rx_n,
       
-    --trignum => evr_dma_trignum, 
-    trigdly => (x"00000001"), 
-    tbt_trig => evr_tbt_trig, 
-    fa_trig => evr_fa_trig, 
-    sa_trig => evr_sa_trig, 
-    usr_trig => evr_dma_trig, 
-    gps_trig => evr_gps_trig, 
-    timestamp => evr_ts,  
-    evr_rcvd_clk => evr_rcvd_clk
-);	
+--    --trignum => evr_dma_trignum, 
+--    trigdly => (x"00000001"), 
+--    tbt_trig => evr_tbt_trig, 
+--    fa_trig => evr_fa_trig, 
+--    sa_trig => evr_sa_trig, 
+--    usr_trig => evr_dma_trig, 
+--    gps_trig => evr_gps_trig, 
+--    timestamp => evr_ts,  
+--    evr_rcvd_clk => evr_rcvd_clk
+--);	
 
 
 

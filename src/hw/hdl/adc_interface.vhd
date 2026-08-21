@@ -62,6 +62,7 @@ architecture behv of adc_interface is
   
   --debug signals (connect to ila)
   attribute mark_debug                 : string;
+  attribute mark_debug of adc_data_ob: signal is "true"; 
   attribute mark_debug of adc_data_2s: signal is "true";        
   attribute mark_debug of adc_data_corr: signal is "true"; 
 
