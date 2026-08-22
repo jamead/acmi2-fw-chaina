@@ -25,14 +25,10 @@ proc setSources {} {
   lappend Sources {"../hdl/read_ltc2107.vhd" "VHDL 2008"} 
   lappend Sources {"../hdl/ltc2107_spi.vhd" "VHDL 2008"} 
   
- 
-  lappend Sources {"../hdl/adc2fifo.vhd" "VHDL 2008"} 
- 
+  lappend Sources {"../hdl/adc_data_rdout.vhd" "VHDL 2008"} 
 
   lappend Sources {"../hdl/stretch.vhd" "VHDL 2008"} 
   lappend Sources {"../hdl/sync_cdc.vhd" "VHDL 2008"}   
-  lappend Sources {"../hdl/adc2dma.vhd" "VHDL 2008"} 
-  
   
   lappend Sources {"../hdl/evr/evr_top.vhd" "VHDL 2008"} 
   lappend Sources {"../hdl/evr/ts_gen.vhd" "VHDL 2008"} 
@@ -74,8 +70,7 @@ proc doOnCreate {} {
   #set_property used_in_implementation false [get_files  top_tb.v] 
    
   source ${TclPath}/system.tcl
-  source ${TclPath}/adcbuf_fifo.tcl
-  source ${TclPath}/adcdata_fifo.tcl 
+  source ${TclPath}/wvfm_fifo.tcl
   source ${TclPath}/evr_gth.tcl
 
 

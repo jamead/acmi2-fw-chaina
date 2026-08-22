@@ -15,14 +15,14 @@ if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
 ##################################################################
 
 # To test this script, run the following commands from Vivado Tcl console:
-# source adcbuf_fifo.tcl
+# source wvfm_fifo.tcl
 # If there is no project opened, this script will create a
 # project, but make sure you do not have an existing project
 # in the current working folder.
 
 set list_projs [get_projects -quiet]
 if { $list_projs eq "" } {
-  create_project vivado vivado -part xczu6eg-ffvb1156-1-e
+  create_project acmi2_hw acmi2_hw -part xczu6eg-ffvb1156-1-e
   set_property target_language VHDL [current_project]
   set_property simulator_language Mixed [current_project]
 }
@@ -57,29 +57,26 @@ if { $bCheckIPsPassed != 1 } {
 }
 
 ##################################################################
-# CREATE IP adcbuf_fifo
+# CREATE IP wvfm_fifo
 ##################################################################
 
-set adcbuf_fifo [create_ip -name fifo_generator -vendor xilinx.com -library ip -version 13.2 -module_name adcbuf_fifo]
+set wvfm_fifo [create_ip -name fifo_generator -vendor xilinx.com -library ip -version 13.2 -module_name wvfm_fifo]
 
 # User Parameters
 set_property -dict [list \
   CONFIG.Enable_Safety_Circuit {false} \
   CONFIG.Fifo_Implementation {Independent_Clocks_Block_RAM} \
-  CONFIG.Input_Data_Width {64} \
-  CONFIG.Input_Depth {8192} \
-  CONFIG.Output_Data_Width {32} \
-  CONFIG.Performance_Options {First_Word_Fall_Through} \
+  CONFIG.Input_Data_Width {16} \
+  CONFIG.Input_Depth {65536} \
+  CONFIG.Output_Data_Width {16} \
   CONFIG.Read_Data_Count {true} \
-  CONFIG.Use_Embedded_Registers {false} \
-  CONFIG.Use_Extra_Logic {true} \
-  CONFIG.asymmetric_port_width {true} \
-] [get_ips adcbuf_fifo]
+  CONFIG.asymmetric_port_width {false} \
+] [get_ips wvfm_fifo]
 
 # Runtime Parameters
 set_property -dict { 
   GENERATE_SYNTH_CHECKPOINT {1}
-} $adcbuf_fifo
+} $wvfm_fifo
 
 ##################################################################
 

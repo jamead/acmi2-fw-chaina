@@ -21,29 +21,24 @@ entity ps_io is
      pl_reset         : in std_logic;
    
      m_axi4_m2s       : in t_pl_regs_m2s;
-     m_axi4_s2m       : out t_pl_regs_s2m;   
-     
-     sa_data         : in t_sa_data;
-     
-	 reg_o_dsa       : out t_reg_o_dsa;
-	 reg_o_therm     : out t_reg_o_therm;
-	 reg_i_therm     : in  t_reg_i_therm;
-	 reg_o_pll       : out t_reg_o_pll;
-	 reg_i_pll       : in  t_reg_i_pll;
-	 reg_o_tbt       : out t_reg_o_tbt;	
-	 reg_o_adcfifo   : out t_reg_o_adc_fifo_rdout;
-	 reg_i_adcfifo   : in  t_reg_i_adc_fifo_rdout; 
-	 reg_o_tbtfifo   : out t_reg_o_tbt_fifo_rdout;
-	 reg_i_tbtfifo   : in  t_reg_i_tbt_fifo_rdout; 	
-	 reg_o_dma       : out t_reg_o_dma; 
-	 reg_i_dma       : in  t_reg_i_dma;
-	 reg_o_adc       : out t_reg_o_adc_cntrl;
-	 reg_i_adc       : in  t_reg_i_adc_status; 
+     m_axi4_s2m       : out t_pl_regs_s2m;  
+      
+     fp_leds          : out std_logic_vector(7 downto 0);
+        
+	 reg_o_adc        : out t_reg_o_adc_cntrl;
+	 reg_i_adc        : in  t_reg_i_adc_status; 
+	 reg_o_adcfifo    : out t_reg_o_adc_fifo_rdout;
+	 reg_i_adcfifo    : in  t_reg_i_adc_fifo_rdout; 
+	 reg_o_eeprom     : out t_reg_o_eeprom;
+	 reg_i_pulsestats : in t_reg_i_pulse_stats_array;
+	 
+	 reg_i_trig      : in t_reg_i_trig;
+
 	 reg_o_evr       : out t_reg_o_evr;
 	 reg_i_evr       : in  t_reg_i_evr;
-	 reg_o_swrffe    : out t_reg_o_swrffe;
-     ioc_access_led  : out std_logic;
-     fp_leds         : out std_logic_vector(7 downto 0)
+
+     ioc_access_led  : out std_logic
+
   );
 end ps_io;
 
@@ -57,8 +52,7 @@ architecture behv of ps_io is
   signal reg_o        : t_addrmap_pl_regs_out;
   signal ioc_access   : std_logic;
 
-  --attribute mark_debug     : string;
-  --attribute mark_debug of reg_o: signal is "true";
+
 
 
 
@@ -67,94 +61,129 @@ begin
 fp_leds <= reg_o.FP_LEDS.val.data;
 ioc_access <= reg_o.ioc_access.data.data(0);
 
-reg_o_therm.spi_we <= reg_o.therm_spi.data.swmod;
-reg_o_therm.spi_wdata <= reg_o.therm_spi.data.data;
-reg_o_therm.sel <= reg_o.therm_sel.data.data;
-reg_i.therm_spi.data.data <= 24d"0" & reg_i_therm.spi_rdata;
-
 
 reg_o_adc.spi_we <= reg_o.adc_spi.data.swmod; 
 reg_o_adc.spi_wdata <= reg_o.adc_spi.data.data; 
 reg_i.adc_spi.data.data <= reg_i_adc.spi_rdata;    
 reg_o_adc.idly_wval <= reg_o.adc_idlyval.data.data;  
 reg_o_adc.idly_wstr <= reg_o.adc_idlystr.data.data; 
-reg_o_adc.fco_dlystr <= reg_o.adc_mmcmdlystr.data.data;  
-reg_i.adc_idlychardval.data.data <= reg_i_adc.idlycha_rval;   
-reg_i.adc_idlychbrdval.data.data <= reg_i_adc.idlychb_rval; 
-reg_i.adc_idlychcrdval.data.data <= reg_i_adc.idlychc_rval; 
-reg_i.adc_idlychdrdval.data.data <= reg_i_adc.idlychd_rval; 
+
+reg_i.adc_idlyrdval.data.data <= reg_i_adc.idly_rval;   
 
 
-reg_o_pll.str <= reg_o.pll_spi.data.swmod;                
-reg_o_pll.data <= reg_o.pll_spi.data.data;
-reg_i.pll_locked.data.data(0) <= reg_i_pll.locked;
+reg_o_adcfifo.fifo_enb <= reg_o.adcfifo_streamenb.data.swmod;
+reg_o_adcfifo.fifo_rst <= reg_o.adcfifo_reset.data.data(0);
+reg_o_adcfifo.fifo_rdstr <= reg_o.adcfifo_data.data.swacc;
+reg_i.adcfifo_rdcnt.data.data <= reg_i_adcfifo.fifo_rdcnt;
+reg_i.adcfifo_data.data.data <= reg_i_adcfifo.fifo_dout;
 
-reg_o_dsa.str <= reg_o.dsa_spi.data.swmod;
-reg_o_dsa.data <= reg_o.dsa_spi.data.data;
 
-
-reg_o_tbt.kx <= reg_o.kx.data.data;
-reg_o_tbt.ky <= reg_o.ky.data.data;
-reg_o_tbt.cha_gain <= reg_o.cha_gain.data.data;
-reg_o_tbt.chb_gain <= reg_o.chb_gain.data.data;
-reg_o_tbt.chc_gain <= reg_o.chc_gain.data.data;
-reg_o_tbt.chd_gain <= reg_o.chd_gain.data.data;
-reg_o_tbt.xpos_offset <= reg_o.xpos_offset.data.data;
-reg_o_tbt.ypos_offset <= reg_o.ypos_offset.data.data;
-reg_o_tbt.gate_delay <= reg_o.gate_delay.data.data;
-reg_o_tbt.gate_width <= reg_o.gate_width.data.data;
-reg_o_tbt.ddc_lpfilt_sel <= reg_o.ddc_lpfilt_sel.data.data(0);
-
-reg_o_adcfifo.enb <= reg_o.adcfifo_streamenb.data.swmod;
-reg_o_adcfifo.rst <= reg_o.adcfifo_reset.data.data(0);
-reg_o_adcfifo.rdstr <= reg_o.adcfifo_data.data.swacc;
-reg_i.adcfifo_rdcnt.data.data <= reg_i_adcfifo.rdcnt;
-reg_i.adcfifo_data.data.data <= reg_i_adcfifo.dout;
-
-reg_o_tbtfifo.enb <= reg_o.tbtfifo_streamenb.data.swmod;
-reg_o_tbtfifo.rst <= reg_o.tbtfifo_reset.data.data(0);
-reg_o_tbtfifo.rdstr <= reg_o.tbtfifo_data.data.swacc;
-reg_i.tbtfifo_rdcnt.data.data <= reg_i_tbtfifo.rdcnt;
-reg_i.tbtfifo_data.data.data <= reg_i_tbtfifo.dout;
-
-reg_o_dma.soft_trig <= reg_o.dma_soft_trig.data.data(0);
-reg_o_dma.trigsrc <= reg_o.dma_trigsrc.data.data(0);
-reg_o_dma.fifo_rst <= reg_o.dma_fifo_rst.data.data(0); 
-reg_o_dma.adc_enb <= reg_o.dma_adc_enb.data.data(0); 
-reg_o_dma.adc_len <= reg_o.dma_adc_len.data.data;
-reg_o_dma.tbt_enb <= reg_o.dma_tbt_enb.data.data(0); 
-reg_o_dma.tbt_len <= reg_o.dma_tbt_len.data.data;
-reg_o_dma.fa_enb <= reg_o.dma_fa_enb.data.data(0); 
-reg_o_dma.fa_len <= reg_o.dma_fa_len.data.data;
-reg_o_dma.txtoioc_done <= reg_o.dma_txtoioc_done.data.data(0);
-
-reg_i.dma_trigcnt.data.data <= reg_i_dma.trig_cnt;
-reg_i.dma_status.data.data <= reg_i_dma.status; 
-
-reg_i.ts_ns.val.data <= reg_i_evr.ts_ns; --x"12345678";
-reg_i.ts_s.val.data <= reg_i_evr.ts_s; --x"deadbeef";
-reg_i.dma_ts_ns.val.data <= reg_i_dma.ts_ns; --x"0123face";
-reg_i.dma_ts_s.val.data <= reg_i_dma.ts_s; --x"ba5eba11";
+reg_i.ts_ns.val.data <= reg_i_evr.ts_ns; 
+reg_i.ts_s.val.data <= reg_i_evr.ts_s; 
+reg_i.trig_ts_ns.val.data <= reg_i_trig.ts_ns; 
+reg_i.trig_ts_s.val.data <= reg_i_trig.ts_s; 
 
 reg_o_evr.reset <= reg_o.evr_reset.data.data(0);
-reg_o_evr.dma_trigno <= reg_o.dma_trig_eventno.val.data;
-reg_o_evr.event_src_sel <= reg_o.event_src_sel.val.data(0);
+reg_o_evr.dma_trigno <= reg_o.trig_eventno.val.data;
 
 
-reg_i.sa_cnt.data.data <= sa_data.cnt;
-reg_i.sa_cha.data.data <= std_logic_vector(sa_data.cha_mag);
-reg_i.sa_chb.data.data <= std_logic_vector(sa_data.chb_mag);
-reg_i.sa_chc.data.data <= std_logic_vector(sa_data.chc_mag);
-reg_i.sa_chd.data.data <= std_logic_vector(sa_data.chd_mag);
-reg_i.sa_sum.data.data <= std_logic_vector(sa_data.sum);
-reg_i.sa_xpos.data.data <= std_logic_vector(sa_data.xpos);
-reg_i.sa_ypos.data.data <= std_logic_vector(sa_data.ypos);
+
+-- EEPROM
+reg_o_eeprom.header <= reg_o.header.val.data;
+reg_o_eeprom.tp1_pulse_delay <= reg_o.tp1_pulse_delay.val.data;
+reg_o_eeprom.tp1_pulse_width <= reg_o.tp1_pulse_width.val.data;
+reg_o_eeprom.tp1_adc_delay <= reg_o.tp1_adc_delay.val.data;
+reg_o_eeprom.tp2_pulse_delay <= reg_o.tp2_pulse_delay.val.data;
+reg_o_eeprom.tp2_pulse_width <= reg_o.tp2_pulse_width.val.data;
+reg_o_eeprom.tp2_adc_delay <= reg_o.tp2_adc_delay.val.data;
+reg_o_eeprom.tp3_pulse_delay <= reg_o.tp3_pulse_delay.val.data;
+reg_o_eeprom.tp3_pulse_width <= reg_o.tp3_pulse_width.val.data;
+reg_o_eeprom.tp3_adc_delay <= reg_o.tp3_adc_delay.val.data;
+reg_o_eeprom.beam_adc_delay <= reg_o.beam_adc_delay.val.data;
+reg_o_eeprom.beam_oow_threshold <= reg_o.beam_oow_threshold.val.data;
+reg_o_eeprom.tp1_int_low_limit <= reg_o.tp1_int_low_limit.val.data;
+reg_o_eeprom.tp1_int_high_limit <= reg_o.tp1_int_high_limit.val.data;
+reg_o_eeprom.tp2_int_low_limit <= reg_o.tp2_int_low_limit.val.data;
+reg_o_eeprom.tp2_int_high_limit <= reg_o.tp2_int_high_limit.val.data;
+reg_o_eeprom.tp3_int_low_limit <= reg_o.tp3_int_low_limit.val.data;
+reg_o_eeprom.tp3_int_high_limit <= reg_o.tp3_int_high_limit.val.data;
+reg_o_eeprom.tp1_peak_low_limit <= reg_o.tp1_peak_low_limit.val.data;
+reg_o_eeprom.tp1_peak_high_limit <= reg_o.tp1_peak_high_limit.val.data;
+reg_o_eeprom.tp2_peak_low_limit <= reg_o.tp2_peak_low_limit.val.data;
+reg_o_eeprom.tp2_peak_high_limit <= reg_o.tp2_peak_high_limit.val.data;
+reg_o_eeprom.tp3_peak_low_limit <= reg_o.tp3_peak_low_limit.val.data;
+reg_o_eeprom.tp3_peak_high_limit <= reg_o.tp3_peak_high_limit.val.data;
+reg_o_eeprom.tp1_fwhm_low_limit <= reg_o.tp1_fwhm_low_limit.val.data;
+reg_o_eeprom.tp1_fwhm_high_limit <= reg_o.tp1_fwhm_high_limit.val.data;
+reg_o_eeprom.tp2_fwhm_low_limit <= reg_o.tp2_fwhm_low_limit.val.data;
+reg_o_eeprom.tp2_fwhm_high_limit <= reg_o.tp2_fwhm_high_limit.val.data;
+reg_o_eeprom.tp3_fwhm_low_limit <= reg_o.tp3_fwhm_low_limit.val.data;
+reg_o_eeprom.tp3_fwhm_high_limit <= reg_o.tp3_fwhm_high_limit.val.data;
+reg_o_eeprom.tp1_base_low_limit <= reg_o.tp1_base_low_limit.val.data;
+reg_o_eeprom.tp1_base_high_limit <= reg_o.tp1_base_high_limit.val.data;
+reg_o_eeprom.tp2_base_low_limit <= reg_o.tp2_base_low_limit.val.data;
+reg_o_eeprom.tp2_base_high_limit <= reg_o.tp2_base_high_limit.val.data;
+reg_o_eeprom.tp3_base_low_limit <= reg_o.tp3_base_low_limit.val.data;
+reg_o_eeprom.tp3_base_high_limit <= reg_o.tp3_base_high_limit.val.data;
+reg_o_eeprom.tp1_pos_level <= reg_o.tp1_pos_level.val.data;
+reg_o_eeprom.tp2_pos_level <= reg_o.tp2_pos_level.val.data;
+reg_o_eeprom.tp3_pos_level <= reg_o.tp3_pos_level.val.data;
+reg_o_eeprom.tp1_neg_level <= reg_o.tp1_neg_level.val.data;
+reg_o_eeprom.tp2_neg_level <= reg_o.tp2_neg_level.val.data;
+reg_o_eeprom.tp3_neg_level <= reg_o.tp3_neg_level.val.data;
+reg_o_eeprom.beamaccum_limit_hr <= reg_o.accum_HL.val.data;
+reg_o_eeprom.beamhigh_limit <= reg_o.beam_HL.val.data;
+reg_o_eeprom.baseline_low_limit <= reg_o.baseline_low_limit.val.data;
+reg_o_eeprom.baseline_high_limit <= reg_o.baseline_high_limit.val.data;
+reg_o_eeprom.charge_calibration <= reg_o.charge_cal.val.data;
+reg_o_eeprom.accum_q_min <= reg_o.accum_q_min.val.data;
+reg_o_eeprom.accum_length <= reg_o.accum_len.val.data;
+reg_o_eeprom.crc32_eeprom <= reg_o.crc_eeprom.val.data;
 
 
-reg_o_swrffe.enb <= reg_o.swrffe_enb.data.data;
-reg_o_swrffe.trigdly <= reg_o.swrffe_trigdly.data.data;
-reg_o_swrffe.demuxdly <= reg_o.swrffe_demuxdly.data.data;
-reg_o_swrffe.adcdma_sel <= reg_o.swrffe_adcdma_sel.data.data(0);
+
+-- Pulse Statistics
+
+reg_i.pulse0_baseline.val.data <= reg_i_pulsestats(0).baseline;
+reg_i.pulse0_integral.val.data <= reg_i_pulsestats(0).integral;
+reg_i.pulse0_peak.val.data <= reg_i_pulsestats(0).peak;
+reg_i.pulse0_peak_index.val.data <= reg_i_pulsestats(0).peak_index;
+reg_i.pulse0_peak_found.val.data(0) <= reg_i_pulsestats(0).peak_found;
+reg_i.pulse0_threshold.val.data <= reg_i_pulsestats(0).threshold;
+reg_i.pulse0_fwhm.val.data <= reg_i_pulsestats(0).fwhm;
+
+reg_i.pulse1_baseline.val.data <= reg_i_pulsestats(1).baseline;
+reg_i.pulse1_integral.val.data <= reg_i_pulsestats(1).integral;
+reg_i.pulse1_peak.val.data <= reg_i_pulsestats(1).peak;
+reg_i.pulse1_peak_index.val.data <= reg_i_pulsestats(1).peak_index;
+reg_i.pulse1_peak_found.val.data(0) <= reg_i_pulsestats(1).peak_found;
+reg_i.pulse1_threshold.val.data <= reg_i_pulsestats(1).threshold;
+reg_i.pulse1_fwhm.val.data <= reg_i_pulsestats(1).fwhm;
+
+reg_i.pulse2_baseline.val.data <= reg_i_pulsestats(2).baseline;
+reg_i.pulse2_integral.val.data <= reg_i_pulsestats(2).integral;
+reg_i.pulse2_peak.val.data <= reg_i_pulsestats(2).peak;
+reg_i.pulse2_peak_index.val.data <= reg_i_pulsestats(2).peak_index;
+reg_i.pulse2_peak_found.val.data(0) <= reg_i_pulsestats(2).peak_found;
+reg_i.pulse2_threshold.val.data <= reg_i_pulsestats(2).threshold;
+reg_i.pulse2_fwhm.val.data <= reg_i_pulsestats(2).fwhm;
+
+reg_i.pulse3_baseline.val.data <= reg_i_pulsestats(3).baseline;
+reg_i.pulse3_integral.val.data <= reg_i_pulsestats(3).integral;
+reg_i.pulse3_peak.val.data <= reg_i_pulsestats(3).peak;
+reg_i.pulse3_peak_index.val.data <= reg_i_pulsestats(3).peak_index;
+reg_i.pulse3_peak_found.val.data(0) <= reg_i_pulsestats(3).peak_found;
+reg_i.pulse3_threshold.val.data <= reg_i_pulsestats(3).threshold;
+reg_i.pulse3_fwhm.val.data <= reg_i_pulsestats(3).fwhm;
+
+reg_i.pulse4_baseline.val.data <= reg_i_pulsestats(4).baseline;
+reg_i.pulse4_integral.val.data <= reg_i_pulsestats(4).integral;
+reg_i.pulse4_peak.val.data <= reg_i_pulsestats(4).peak;
+reg_i.pulse4_peak_index.val.data <= reg_i_pulsestats(4).peak_index;
+reg_i.pulse4_peak_found.val.data(0) <= reg_i_pulsestats(4).peak_found;
+reg_i.pulse4_threshold.val.data <= reg_i_pulsestats(4).threshold;
+reg_i.pulse4_fwhm.val.data <= reg_i_pulsestats(4).fwhm;
+
 
 
 

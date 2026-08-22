@@ -123,7 +123,6 @@ set bCheckIPsPassed 1
 set bCheckIPs 1
 if { $bCheckIPs == 1 } {
    set list_check_ips "\ 
-xilinx.com:ip:axi_dma:7.1\
 xilinx.com:ip:proc_sys_reset:5.0\
 xilinx.com:ip:smartconnect:1.0\
 xilinx.com:ip:zynq_ultra_ps_e:3.4\
@@ -190,45 +189,6 @@ proc create_root_design { parentCell } {
 
 
   # Create interface ports
-  set S_AXIS_S2MM_ADC [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:axis_rtl:1.0 S_AXIS_S2MM_ADC ]
-  set_property -dict [ list \
-   CONFIG.HAS_TKEEP {1} \
-   CONFIG.HAS_TLAST {1} \
-   CONFIG.HAS_TREADY {1} \
-   CONFIG.HAS_TSTRB {0} \
-   CONFIG.LAYERED_METADATA {undef} \
-   CONFIG.TDATA_NUM_BYTES {8} \
-   CONFIG.TDEST_WIDTH {0} \
-   CONFIG.TID_WIDTH {0} \
-   CONFIG.TUSER_WIDTH {0} \
-   ] $S_AXIS_S2MM_ADC
-
-  set S_AXIS_S2MM_FA [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:axis_rtl:1.0 S_AXIS_S2MM_FA ]
-  set_property -dict [ list \
-   CONFIG.HAS_TKEEP {1} \
-   CONFIG.HAS_TLAST {1} \
-   CONFIG.HAS_TREADY {1} \
-   CONFIG.HAS_TSTRB {0} \
-   CONFIG.LAYERED_METADATA {undef} \
-   CONFIG.TDATA_NUM_BYTES {8} \
-   CONFIG.TDEST_WIDTH {0} \
-   CONFIG.TID_WIDTH {0} \
-   CONFIG.TUSER_WIDTH {0} \
-   ] $S_AXIS_S2MM_FA
-
-  set S_AXIS_S2MM_TBT [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:axis_rtl:1.0 S_AXIS_S2MM_TBT ]
-  set_property -dict [ list \
-   CONFIG.HAS_TKEEP {1} \
-   CONFIG.HAS_TLAST {1} \
-   CONFIG.HAS_TREADY {1} \
-   CONFIG.HAS_TSTRB {0} \
-   CONFIG.LAYERED_METADATA {undef} \
-   CONFIG.TDATA_NUM_BYTES {8} \
-   CONFIG.TDEST_WIDTH {0} \
-   CONFIG.TID_WIDTH {0} \
-   CONFIG.TUSER_WIDTH {0} \
-   ] $S_AXIS_S2MM_TBT
-
   set m_axi [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 m_axi ]
   set_property -dict [ list \
    CONFIG.ADDR_WIDTH {32} \
@@ -252,41 +212,9 @@ proc create_root_design { parentCell } {
  ] $pl_clk0
   set pl_clk1 [ create_bd_port -dir O -type clk pl_clk1 ]
   set_property -dict [ list \
-   CONFIG.ASSOCIATED_BUSIF {S_AXIS_S2MM_ADC:S_AXIS_S2MM_TBT:S_AXIS_S2MM_FA} \
+   CONFIG.ASSOCIATED_BUSIF {} \
  ] $pl_clk1
   set pl_resetn [ create_bd_port -dir O -type rst pl_resetn ]
-  set s2mm_introut_0 [ create_bd_port -dir O -type intr s2mm_introut_0 ]
-  set s2mm_prmry_reset_out_n_0 [ create_bd_port -dir O -type rst s2mm_prmry_reset_out_n_0 ]
-
-  # Create instance: axi_dma_adc, and set properties
-  set axi_dma_adc [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_adc ]
-  set_property -dict [list \
-    CONFIG.c_include_mm2s {0} \
-    CONFIG.c_include_sg {0} \
-    CONFIG.c_s_axis_s2mm_tdata_width {64} \
-    CONFIG.c_sg_length_width {26} \
-  ] $axi_dma_adc
-
-
-  # Create instance: axi_dma_fa, and set properties
-  set axi_dma_fa [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_fa ]
-  set_property -dict [list \
-    CONFIG.c_include_mm2s {0} \
-    CONFIG.c_include_sg {0} \
-    CONFIG.c_s_axis_s2mm_tdata_width {64} \
-    CONFIG.c_sg_length_width {26} \
-  ] $axi_dma_fa
-
-
-  # Create instance: axi_dma_tbt, and set properties
-  set axi_dma_tbt [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_tbt ]
-  set_property -dict [list \
-    CONFIG.c_include_mm2s {0} \
-    CONFIG.c_include_sg {0} \
-    CONFIG.c_s_axis_s2mm_tdata_width {64} \
-    CONFIG.c_sg_length_width {26} \
-  ] $axi_dma_tbt
-
 
   # Create instance: rst_ps8_0_100M, and set properties
   set rst_ps8_0_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps8_0_100M ]
@@ -297,11 +225,6 @@ proc create_root_design { parentCell } {
     CONFIG.NUM_MI {4} \
     CONFIG.NUM_SI {1} \
   ] $smartconnect_0
-
-
-  # Create instance: smartconnect_1, and set properties
-  set smartconnect_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 smartconnect_1 ]
-  set_property CONFIG.NUM_SI {3} $smartconnect_1
 
 
   # Create instance: zynq_ultra_ps_e_0, and set properties
@@ -1149,7 +1072,7 @@ Firmware| SA:0xFF410000; SIZE:640; UNIT:KB; RegionTZ:Secure; WrAllowed:Read/Writ
 SA:0xFF9A0000; SIZE:64; UNIT:KB; RegionTZ:Secure; WrAllowed:Read/Write; subsystemId:PMU Firmware|SA:0xFF5E0000 ; SIZE:2560; UNIT:KB; RegionTZ:Secure ; WrAllowed:Read/Write; subsystemId:Secure Subsystem|SA:0xFFCC0000\
 ; SIZE:64; UNIT:KB; RegionTZ:Secure ; WrAllowed:Read/Write; subsystemId:Secure Subsystem|SA:0xFF180000 ; SIZE:768; UNIT:KB; RegionTZ:Secure ; WrAllowed:Read/Write; subsystemId:Secure Subsystem|SA:0xFF9A0000\
 ; SIZE:64; UNIT:KB; RegionTZ:Secure ; WrAllowed:Read/Write; subsystemId:Secure Subsystem} \
-    CONFIG.PSU__PROTECTION__MASTERS {USB1:NonSecure;0|USB0:NonSecure;1|S_AXI_LPD:NA;0|S_AXI_HPC1_FPD:NA;0|S_AXI_HPC0_FPD:NA;0|S_AXI_HP3_FPD:NA;0|S_AXI_HP2_FPD:NA;0|S_AXI_HP1_FPD:NA;0|S_AXI_HP0_FPD:NA;1|S_AXI_ACP:NA;0|S_AXI_ACE:NA;0|SD1:NonSecure;1|SD0:NonSecure;0|SATA1:NonSecure;1|SATA0:NonSecure;1|RPU1:Secure;1|RPU0:Secure;1|QSPI:NonSecure;0|PMU:NA;1|PCIe:NonSecure;0|NAND:NonSecure;0|LDMA:NonSecure;1|GPU:NonSecure;1|GEM3:NonSecure;1|GEM2:NonSecure;0|GEM1:NonSecure;0|GEM0:NonSecure;0|FDMA:NonSecure;1|DP:NonSecure;0|DAP:NA;1|Coresight:NA;1|CSU:NA;1|APU:NA;1}\
+    CONFIG.PSU__PROTECTION__MASTERS {USB1:NonSecure;0|USB0:NonSecure;1|S_AXI_LPD:NA;0|S_AXI_HPC1_FPD:NA;0|S_AXI_HPC0_FPD:NA;0|S_AXI_HP3_FPD:NA;0|S_AXI_HP2_FPD:NA;0|S_AXI_HP1_FPD:NA;0|S_AXI_HP0_FPD:NA;0|S_AXI_ACP:NA;0|S_AXI_ACE:NA;0|SD1:NonSecure;1|SD0:NonSecure;0|SATA1:NonSecure;1|SATA0:NonSecure;1|RPU1:Secure;1|RPU0:Secure;1|QSPI:NonSecure;0|PMU:NA;1|PCIe:NonSecure;0|NAND:NonSecure;0|LDMA:NonSecure;1|GPU:NonSecure;1|GEM3:NonSecure;1|GEM2:NonSecure;0|GEM1:NonSecure;0|GEM0:NonSecure;0|FDMA:NonSecure;1|DP:NonSecure;0|DAP:NA;1|Coresight:NA;1|CSU:NA;1|APU:NA;1}\
 \
     CONFIG.PSU__PROTECTION__MASTERS_TZ {GEM0:NonSecure|SD1:NonSecure|GEM2:NonSecure|GEM1:NonSecure|GEM3:NonSecure|PCIe:NonSecure|DP:NonSecure|NAND:NonSecure|GPU:NonSecure|USB1:NonSecure|USB0:NonSecure|LDMA:NonSecure|FDMA:NonSecure|QSPI:NonSecure|SD0:NonSecure}\
 \
@@ -1171,7 +1094,6 @@ Port;FD4A0000;FD4AFFFF;0|FPD;DPDMA;FD4C0000;FD4CFFFF;0|FPD;DDR_XMPU5_CFG;FD05000
     CONFIG.PSU__SATA__PERIPHERAL__ENABLE {1} \
     CONFIG.PSU__SATA__REF_CLK_FREQ {125} \
     CONFIG.PSU__SATA__REF_CLK_SEL {Ref Clk1} \
-    CONFIG.PSU__SAXIGP2__DATA_WIDTH {128} \
     CONFIG.PSU__SD0__CLK_100_SDR_OTAP_DLY {0x3} \
     CONFIG.PSU__SD0__CLK_200_SDR_OTAP_DLY {0x3} \
     CONFIG.PSU__SD0__CLK_50_DDR_ITAP_DLY {0x3D} \
@@ -1275,7 +1197,7 @@ Port;FD4A0000;FD4AFFFF;0|FPD;DPDMA;FD4C0000;FD4CFFFF;0|FPD;DDR_XMPU5_CFG;FD05000
     CONFIG.PSU__USE__S_AXI_ACP {0} \
     CONFIG.PSU__USE__S_AXI_GP0 {0} \
     CONFIG.PSU__USE__S_AXI_GP1 {0} \
-    CONFIG.PSU__USE__S_AXI_GP2 {1} \
+    CONFIG.PSU__USE__S_AXI_GP2 {0} \
     CONFIG.PSU__USE__S_AXI_GP3 {0} \
     CONFIG.PSU__USE__S_AXI_GP4 {0} \
     CONFIG.PSU__USE__S_AXI_GP5 {0} \
@@ -1308,43 +1230,16 @@ Port;FD4A0000;FD4AFFFF;0|FPD;DPDMA;FD4C0000;FD4CFFFF;0|FPD;DDR_XMPU5_CFG;FD05000
 
 
   # Create interface connections
-  connect_bd_intf_net -intf_net S_AXIS_S2MM_0_1 [get_bd_intf_ports S_AXIS_S2MM_ADC] [get_bd_intf_pins axi_dma_adc/S_AXIS_S2MM]
-  connect_bd_intf_net -intf_net S_AXIS_S2MM_1_1 [get_bd_intf_ports S_AXIS_S2MM_TBT] [get_bd_intf_pins axi_dma_tbt/S_AXIS_S2MM]
-  connect_bd_intf_net -intf_net S_AXIS_S2MM_2_1 [get_bd_intf_ports S_AXIS_S2MM_FA] [get_bd_intf_pins axi_dma_fa/S_AXIS_S2MM]
-  connect_bd_intf_net -intf_net axi_dma_adc_M_AXI_S2MM [get_bd_intf_pins axi_dma_adc/M_AXI_S2MM] [get_bd_intf_pins smartconnect_1/S00_AXI]
-  connect_bd_intf_net -intf_net axi_dma_fa_M_AXI_S2MM [get_bd_intf_pins axi_dma_fa/M_AXI_S2MM] [get_bd_intf_pins smartconnect_1/S02_AXI]
-  connect_bd_intf_net -intf_net axi_dma_tbt_M_AXI_S2MM [get_bd_intf_pins axi_dma_tbt/M_AXI_S2MM] [get_bd_intf_pins smartconnect_1/S01_AXI]
   connect_bd_intf_net -intf_net smartconnect_0_M00_AXI [get_bd_intf_ports m_axi] [get_bd_intf_pins smartconnect_0/M00_AXI]
-  connect_bd_intf_net -intf_net smartconnect_0_M01_AXI [get_bd_intf_pins axi_dma_adc/S_AXI_LITE] [get_bd_intf_pins smartconnect_0/M01_AXI]
-  connect_bd_intf_net -intf_net smartconnect_0_M02_AXI [get_bd_intf_pins axi_dma_tbt/S_AXI_LITE] [get_bd_intf_pins smartconnect_0/M02_AXI]
-  connect_bd_intf_net -intf_net smartconnect_0_M03_AXI [get_bd_intf_pins axi_dma_fa/S_AXI_LITE] [get_bd_intf_pins smartconnect_0/M03_AXI]
-  connect_bd_intf_net -intf_net smartconnect_1_M00_AXI [get_bd_intf_pins smartconnect_1/M00_AXI] [get_bd_intf_pins zynq_ultra_ps_e_0/S_AXI_HP0_FPD]
   connect_bd_intf_net -intf_net zynq_ultra_ps_e_0_M_AXI_HPM0_FPD [get_bd_intf_pins smartconnect_0/S00_AXI] [get_bd_intf_pins zynq_ultra_ps_e_0/M_AXI_HPM0_FPD]
 
   # Create port connections
-  connect_bd_net -net Net [get_bd_pins axi_dma_adc/axi_resetn] [get_bd_pins axi_dma_fa/axi_resetn] [get_bd_pins axi_dma_tbt/axi_resetn] [get_bd_pins rst_ps8_0_100M/peripheral_aresetn] [get_bd_pins smartconnect_1/aresetn]
-  connect_bd_net -net axi_dma_fa_s2mm_introut [get_bd_ports s2mm_introut_0] [get_bd_pins axi_dma_fa/s2mm_introut]
-  connect_bd_net -net axi_dma_fa_s2mm_prmry_reset_out_n [get_bd_ports s2mm_prmry_reset_out_n_0] [get_bd_pins axi_dma_fa/s2mm_prmry_reset_out_n]
-  connect_bd_net -net zynq_ultra_ps_e_0_pl_clk0 [get_bd_ports pl_clk0] [get_bd_pins axi_dma_adc/s_axi_lite_aclk] [get_bd_pins axi_dma_fa/s_axi_lite_aclk] [get_bd_pins axi_dma_tbt/s_axi_lite_aclk] [get_bd_pins rst_ps8_0_100M/slowest_sync_clk] [get_bd_pins smartconnect_0/aclk] [get_bd_pins zynq_ultra_ps_e_0/maxihpm0_fpd_aclk] [get_bd_pins zynq_ultra_ps_e_0/pl_clk0]
-  connect_bd_net -net zynq_ultra_ps_e_0_pl_clk1 [get_bd_ports pl_clk1] [get_bd_pins axi_dma_adc/m_axi_s2mm_aclk] [get_bd_pins axi_dma_fa/m_axi_s2mm_aclk] [get_bd_pins axi_dma_tbt/m_axi_s2mm_aclk] [get_bd_pins smartconnect_1/aclk] [get_bd_pins zynq_ultra_ps_e_0/pl_clk1] [get_bd_pins zynq_ultra_ps_e_0/saxihp0_fpd_aclk]
+  connect_bd_net -net zynq_ultra_ps_e_0_pl_clk0 [get_bd_ports pl_clk0] [get_bd_pins rst_ps8_0_100M/slowest_sync_clk] [get_bd_pins smartconnect_0/aclk] [get_bd_pins zynq_ultra_ps_e_0/maxihpm0_fpd_aclk] [get_bd_pins zynq_ultra_ps_e_0/pl_clk0]
+  connect_bd_net -net zynq_ultra_ps_e_0_pl_clk1 [get_bd_ports pl_clk1] [get_bd_pins zynq_ultra_ps_e_0/pl_clk1]
   connect_bd_net -net zynq_ultra_ps_e_0_pl_resetn0 [get_bd_ports pl_resetn] [get_bd_pins rst_ps8_0_100M/ext_reset_in] [get_bd_pins smartconnect_0/aresetn] [get_bd_pins zynq_ultra_ps_e_0/pl_resetn0]
 
   # Create address segments
-  assign_bd_address -offset 0x00000000 -range 0x80000000 -target_address_space [get_bd_addr_spaces axi_dma_adc/Data_S2MM] [get_bd_addr_segs zynq_ultra_ps_e_0/SAXIGP2/HP0_DDR_LOW] -force
-  assign_bd_address -offset 0x00000000 -range 0x80000000 -target_address_space [get_bd_addr_spaces axi_dma_fa/Data_S2MM] [get_bd_addr_segs zynq_ultra_ps_e_0/SAXIGP2/HP0_DDR_LOW] -force
-  assign_bd_address -offset 0x00000000 -range 0x80000000 -target_address_space [get_bd_addr_spaces axi_dma_tbt/Data_S2MM] [get_bd_addr_segs zynq_ultra_ps_e_0/SAXIGP2/HP0_DDR_LOW] -force
-  assign_bd_address -offset 0xA0010000 -range 0x00010000 -target_address_space [get_bd_addr_spaces zynq_ultra_ps_e_0/Data] [get_bd_addr_segs axi_dma_adc/S_AXI_LITE/Reg] -force
-  assign_bd_address -offset 0xA0020000 -range 0x00010000 -target_address_space [get_bd_addr_spaces zynq_ultra_ps_e_0/Data] [get_bd_addr_segs axi_dma_fa/S_AXI_LITE/Reg] -force
-  assign_bd_address -offset 0xA0030000 -range 0x00010000 -target_address_space [get_bd_addr_spaces zynq_ultra_ps_e_0/Data] [get_bd_addr_segs axi_dma_tbt/S_AXI_LITE/Reg] -force
   assign_bd_address -offset 0xA0000000 -range 0x00010000 -target_address_space [get_bd_addr_spaces zynq_ultra_ps_e_0/Data] [get_bd_addr_segs m_axi/Reg] -force
-
-  # Exclude Address Segments
-  exclude_bd_addr_seg -target_address_space [get_bd_addr_spaces axi_dma_adc/Data_S2MM] [get_bd_addr_segs zynq_ultra_ps_e_0/SAXIGP2/HP0_DDR_HIGH]
-  exclude_bd_addr_seg -offset 0xFF000000 -range 0x01000000 -target_address_space [get_bd_addr_spaces axi_dma_adc/Data_S2MM] [get_bd_addr_segs zynq_ultra_ps_e_0/SAXIGP2/HP0_LPS_OCM]
-  exclude_bd_addr_seg -target_address_space [get_bd_addr_spaces axi_dma_fa/Data_S2MM] [get_bd_addr_segs zynq_ultra_ps_e_0/SAXIGP2/HP0_DDR_HIGH]
-  exclude_bd_addr_seg -offset 0xFF000000 -range 0x01000000 -target_address_space [get_bd_addr_spaces axi_dma_fa/Data_S2MM] [get_bd_addr_segs zynq_ultra_ps_e_0/SAXIGP2/HP0_LPS_OCM]
-  exclude_bd_addr_seg -target_address_space [get_bd_addr_spaces axi_dma_tbt/Data_S2MM] [get_bd_addr_segs zynq_ultra_ps_e_0/SAXIGP2/HP0_DDR_HIGH]
-  exclude_bd_addr_seg -offset 0xFF000000 -range 0x01000000 -target_address_space [get_bd_addr_spaces axi_dma_tbt/Data_S2MM] [get_bd_addr_segs zynq_ultra_ps_e_0/SAXIGP2/HP0_LPS_OCM]
 
 
   # Restore current instance
