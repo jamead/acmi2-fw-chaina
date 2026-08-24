@@ -12,9 +12,10 @@
 #include "task.h"
 
 /* Hardware support includes */
-#include "zubpm.h"
 #include "pl_regs.h"
 #include "psc_msg.h"
+#include "at24eeprom.h"
+#include "zudfe.h"
 
 
 
@@ -61,8 +62,82 @@ void write_adc_table(void *msg, u32 msglen)
 
 
 
+void eeprom_settings(void *msg)
+{
+    uint32_t *msgptr = (uint32_t *)msg;
+    uint32_t eeprom_addr;
+    uint32_t msg_data;
+    uint32_t pl_addr;
+    int status;
+
+    Eeprom_params_msg_t eeprom_data;
+    u8 eeprom_page[EEPROM_PAGE_SIZE];
+
+    /*
+     * Message from IOC:
+     *   msgptr[0] = EEPROM parameter byte offset
+     *   msgptr[1] = new value
+     */
+    eeprom_addr = ntohl(msgptr[0]);
+    msg_data = ntohl(msgptr[1]);
+
+    xil_printf("EEPROM Addr: %lu  Data: %lu\r\n",
+               (unsigned long)eeprom_addr,
+               (unsigned long)msg_data);
+
+    /*
+     * Check that the requested address is within the
+     * 200-byte EEPROM parameter block and is 32-bit aligned.
+     */
+    if ((eeprom_addr >= EEPROM_PARAMS_SIZE_BYTES) ||
+        ((eeprom_addr & 0x3U) != 0U)) {
+
+        xil_printf("ERROR: Invalid EEPROM address: %lu\r\n",
+                   (unsigned long)eeprom_addr);
+
+        return;
+    }
+
+    /*
+     * Update the corresponding PL register.
+     */
+    pl_addr = XPAR_M_AXI_BASEADDR +
+              EEPROM_PARAMS_BASE_OFFSET +
+              eeprom_addr;
+
+    Xil_Out32(pl_addr, msg_data);
+
+    /*
+     * Read all 50 current PL registers into the EEPROM structure.
+     */
+    EepromGatherData(&eeprom_data);
+
+    /*
+     * EEPROM writes are one complete 256-byte page.
+     * Fill unused bytes with erased EEPROM value (0xFF).
+     */
+    memset(eeprom_page, 0xFF, sizeof(eeprom_page));
+
+    memcpy(eeprom_page,
+           &eeprom_data,
+           sizeof(eeprom_data));
+
+    /*
+     * Write the entire EEPROM page.
+     */
+    status = EepromWrite256(0x0000, eeprom_page);
+
+    if (status != XST_SUCCESS) {
+        xil_printf("ERROR: EEPROM write failed\r\n");
+    }
+    else {
+        xil_printf("EEPROM parameters updated successfully\r\n");
+    }
+}
 
 
+
+/*
 void eeprom_settings(void *msg) {
 
 	u32 *msgptr = (u32 *)msg;
@@ -78,7 +153,7 @@ void eeprom_settings(void *msg) {
     xil_printf("EEPROM Addr: %d    Data: %d\r\n",eeprom_addr, msg_data);
 
 }
-
+*/
 
 
 

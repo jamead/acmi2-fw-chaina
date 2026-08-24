@@ -62,7 +62,9 @@ end component;
   attribute mark_debug of adc_data: signal is "true";
   attribute mark_debug of reg_o: signal is "true";
   attribute mark_debug of reg_i: signal is "true";
-
+  attribute mark_debug of trig_s: signal is "true";
+  attribute mark_debug of fifo_dout: signal is "true";
+  
 
 begin
 

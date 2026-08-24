@@ -19,7 +19,7 @@
 
 #include "local.h"
 #include "pl_regs.h"
-#include "zubpm.h"
+#include "zudfe.h"
 
 
 
@@ -151,8 +151,10 @@ static void client_msg(void *pvt, psc_client *ckey, uint16_t msgid, uint32_t msg
         	break;
         case 2: //eeprom settings
         	eeprom_settings(msg);
+        	break;
         case 3: //tail cancellation table
         	write_adc_table(msg,msglen);
+        	break;
         case 5: //ping event
             break;
     }
@@ -230,6 +232,13 @@ int main()
 	xil_printf("Init lmk1e2...\r\n");
     write_lmk61e2();
 
+    //Read EEPROM and update PL registers
+    InitSettingsfromEeprom();
+
+	//Set trigger event to 32
+	Xil_Out32(XPAR_M_AXI_BASEADDR + TRIG_EVENTNO_REG, 32);
+	usleep(10);
+
 
 	//EVR reset
 	Xil_Out32(XPAR_M_AXI_BASEADDR + EVR_RST_REG, 0xFF);
@@ -244,6 +253,8 @@ int main()
        xil_printf("ts= %d    %d\r\n",ts_s,ts_ns);
        sleep(1);
     }
+
+
 
 
     sys_thread_new("main", realmain, NULL, THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);

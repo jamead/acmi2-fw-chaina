@@ -11,9 +11,9 @@
 #include <lwip/stats.h>
 
 #include "local.h"
+#include "at24eeprom.h"
 
 #include "pl_regs.h"
-
 
 
 
@@ -25,14 +25,17 @@ static void wvfmdata_push(void *unused)
 {
     (void)unused;
 
-    u32 wvfm_debug = 1;
+    u32 wvfm_debug = 0;
     u32 wordcnt, pollcnt;
     u32 i;
     s32 rdbk;
+    u32 rdcnt;
+    uint32_t *ptr;
+
+    Eeprom_params_msg_t eeprom_data, eeprom_tx;
 
 
     static s32 pulse_stats[64];
-    static s32 eeprom[64];
     static s16 boow_adc[128];
     static s16 wvfm_adc[16000];
     static u32 timestamp[2];
@@ -57,9 +60,9 @@ static void wvfmdata_push(void *unused)
         	pollcnt++;
         } while (wordcnt < 8000); // && (pollcnt < 5000));
 
-        xil_printf("Got Trig!   PollCnt: %d     Num FIFO Words: %d\r\n", pollcnt, wordcnt);
+        //xil_printf("Got Trig!   PollCnt: %d     Num FIFO Words: %d\r\n", pollcnt, wordcnt);
 
-        if (wordcnt > 8000) {
+        if (wordcnt > 15900) {
 
           // First 64 words are Pulse Statistics
           //if (wvfm_debug)  xil_printf("Pulse Stats...\r\n");
@@ -90,12 +93,19 @@ static void wvfmdata_push(void *unused)
           //  16k are the ADC samples after the trigger
           for (i=0;i<16000;i++) {
         	  rdbk = Xil_In32(XPAR_M_AXI_BASEADDR + ADCFIFO_DATA_REG);
-        	  wvfm_adc[i] = htonl(rdbk);
+        	  rdcnt = Xil_In32(XPAR_M_AXI_BASEADDR + ADCFIFO_RDCNT_REG);
+        	  //if (i<50)
+        	  // 	  xil_printf("%d:  %d     %d\r\n",i,rdcnt,rdbk);
+        	  wvfm_adc[i] = htons(rdbk);
 
           }
 
-          timestamp[0] = htonl(Xil_In32(XPAR_M_AXI_BASEADDR + EVR_TS_NS_LAT_REG));
-          timestamp[1] = htonl(Xil_In32(XPAR_M_AXI_BASEADDR + EVR_TS_S_LAT_REG));
+          psc_send(the_server, 54, sizeof(wvfm_adc), wvfm_adc);
+
+
+          timestamp[0] = htonl(Xil_In32(XPAR_M_AXI_BASEADDR + EVR_TS_NS_REG));
+          timestamp[1] = htonl(Xil_In32(XPAR_M_AXI_BASEADDR + EVR_TS_S_REG));
+          psc_send(the_server, 55, sizeof(timestamp), timestamp);
           //xil_printf("Timestamp ns: %d\r\n",timestamp[0]);
           //xil_printf("Timestamp s : %d\r\n",timestamp[1]);
 
@@ -128,16 +138,26 @@ static void wvfmdata_push(void *unused)
         wordcnt = Xil_In32(XPAR_M_AXI_BASEADDR + ADCFIFO_RDCNT_REG);
         if (wvfm_debug) xil_printf("Num FIFO Words: %d\r\n", wordcnt);
 
-        //xil_printf("\r\n\r\n");
 
 
 
+        //Send the EEPROM data
+        EepromGatherData(&eeprom_data);
+        /* Make a copy for network transmission */
+        eeprom_tx = eeprom_data;
+        /* Convert all 50 32-bit words to network byte order */
+        ptr = (uint32_t *)&eeprom_tx;
+        for (uint32_t i = 0; i < EEPROM_PARAMS_NUM_REGS; i++) {
+            ptr[i] = htonl(ptr[i]);
+        }
+        psc_send(the_server, 52, sizeof(eeprom_tx), &eeprom_tx);
 
-        //psc_send(the_server, 52, sizeof(eeprom), eeprom);
+
+
         //psc_send(the_server, 53, sizeof(boow_adc), boow_adc);
-        psc_send(the_server, 54, sizeof(wvfm_adc), wvfm_adc);
+
         //psc_send(the_server, 51, sizeof(pulse_stats), pulse_stats);
-        psc_send(the_server, 55, sizeof(timestamp), timestamp);
+
 
 
     }

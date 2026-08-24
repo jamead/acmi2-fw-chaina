@@ -12,10 +12,8 @@ create_clock -period 5.000 -name adc_clk_in [get_ports adc_clk_p]
 
 
 
-set_clock_groups -name async_clock_domains -asynchronous \
-    -group [get_clocks -include_generated_clocks {clk_pl_0}] \
-    -group [get_clocks -include_generated_clocks {adc_clk_in}] \
-    -group [get_clocks {rxoutclk_out[0] txoutclk_out[0]}]
+set_clock_groups -name async_clock_domains -asynchronous -group [get_clocks -include_generated_clocks clk_pl_0] -group [get_clocks -include_generated_clocks adc_clk_in] -group [get_clocks {{rxoutclk_out[0]} {txoutclk_out[0]}}]
+
 
 
 

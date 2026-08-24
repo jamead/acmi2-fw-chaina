@@ -1,19 +1,4 @@
 
-#define RFATTEN 0
-#define PTATTEN 1
-#define HOR 0
-#define VERT 1
-#define CHA 0
-#define CHB 1
-#define CHC 2
-#define CHD 3
-
-#define ADC 0
-#define TBT 1
-#define FA 2
-
-#define STRAIGHT 0
-#define RING 1
 
 #define BRDTEMP0_ADDR 0x48
 #define BRDTEMP1_ADDR 0x49

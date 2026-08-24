@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include "FreeRTOS.h"
 #include "task.h"
-#include "zubpm.h"
+
+#include "zudfe.h"
 
 
 extern XIicPs IicPsInstance;			/* Instance of the IIC Device */
@@ -19,139 +20,6 @@ static const u32 lmk61e2_values [] = {
 		0x3800, 0x4802,
 };
 
-
-// Registers to program si571 to 25MHz.
-/*static const uint8_t si571_values[][2] = {
-	{137, 0x10}, //Freeze DCO
-	{7, 0x66},
-    {8, 0xC2},
-    {9, 0xAE},
-    {10, 0x01},
-    {11, 0x18},
-    {12, 0xFC},
-    {137, 0x0},  //Unfreeze DCO
-	{135, 0x40}  //Enable New Frequency
-};*/
-
-// Registers to program si571 to 117.3491MHz.
-/*
-static const uint8_t si571_values[][2] = {
-	{137, 0x10}, //Freeze DCO
-	{7, 0x61},
-    {8, 0x42},
-    {9, 0xB2},
-    {10, 0x04},
-    {11, 0x5B},
-    {12, 0x76},
-    {137, 0x0},  //Unfreeze DCO
-	{135, 0x40}  //Enable New Frequency
-};
-*/
-
-static const uint8_t si571_values[][2] = {
-	{137, 0x10}, //Freeze DCO
-	{7, 0xA0},
-    {8, 0xC2},
-    {9, 0xD3},
-    {10, 0x69},
-    {11, 0xB0},
-    {12, 0x13},
-    {137, 0x0},  //Unfreeze DCO
-	{135, 0x40}  //Enable New Frequency
-};
-
-
-static const uint8_t si569_values[][2] = {
-	{255, 0x10}, //Freeze DCO
-	{69, 0x00},
-    {17, 0x00},
-	{23, 0x5E},
-	{24, 0x00},
-	{26, 0x66},
-	{27, 0x2F},
-	{28, 0x2B},
-	{29, 0x49},
-	{30, 0x48},
-	{31, 0x00},
-	{32, 0x08},
-	{35, 0x86},
-	{7,  0x08},
-	{17, 0x01}
-};
-
-
-
-
-void read_si569() {
-   u8 i, buf[2], stat;
-
-   xil_printf("Read si569 registers\r\n");
-   for (i=0;i<9;i++) {
-       buf[0] = i+23;
-       i2c_write(buf,1,0x56);
-       stat = i2c_read(buf, 1, 0x56);
-       xil_printf("Stat: %d:   val0:%x  \r\n",stat, buf[0]);
-	}
-	xil_printf("\r\n");
-}
-
-
-void prog_si569() {
-	u8 buf[2], stat;
-
-	//xil_printf("Si571 Registers before re-programming...\r\n");
-	//read_si571();
-	xil_printf("Programming si569\r\n");
-
-
-	//Program New Registers
-	for (size_t i = 0; i < sizeof(si569_values) / sizeof(si569_values[0]); i++) {
-	    buf[0] = si569_values[i][0];
-	    buf[1] = si569_values[i][1];
-	    stat = i2c_write(buf, 2, 0x56);
-	    xil_printf("Stat: %d:   val0:%x  \r\n",stat, buf[0]);
-	    usleep(50000);
-	}
-	//xil_printf("Si571 Registers after re-programming...\r\n");
-    //read_si571();
-}
-
-
-
-
-
-
-
-
-
-void read_si571() {
-   u8 i, buf[2], stat;
-
-   xil_printf("Read si571 registers\r\n");
-   for (i=0;i<6;i++) {
-       buf[0] = i+7;
-       i2c_write(buf,1,0x56);
-       stat = i2c_read(buf, 1, 0x56);
-       xil_printf("Stat: %d:   val0:%x  \r\n",stat, buf[0]);
-	}
-	xil_printf("\r\n");
-}
-
-
-void prog_si571() {
-	u8 buf[2];
-
-	xil_printf("Si571 Registers before re-programming...\r\n");
-	read_si571();
-	//Program New Registers
-	for (size_t i = 0; i < sizeof(si571_values) / sizeof(si571_values[0]); i++) {
-	    buf[0] = si571_values[i][0];
-	    buf[1] = si571_values[i][1];
-	    i2c_write(buf, 2, 0x56);
-	}
-	xil_printf("Si571 Registers after re-programming...\r\n");
-    read_si571();
-}
 
 
 
@@ -276,46 +144,6 @@ void eeprom_dump()
 
 
 
-
-
-
-
-/*
-void eeprom_write_ipaddr()
-{
-  u8 ip_addr[16], wrBuf[128];
-  u8 octet1, octet2, octet3, octet4;
-
-  memset(wrBuf, 0, 128);
-
-
-  // Prompt the user to enter an IP address
-  printf("Enter an IP address (format: x.x.x.x): ");
-
-  // Read the IP address as four separate integers (octets)
-  if (scanf("%u%u%u%u", &octet1, &octet2, &octet3, &octet4) == 4) {
-        // Validate that each octet is within the range 0-255
-        if (octet1 <= 255 && octet2 <= 255 && octet3 <= 255 && octet4 <= 255) {
-            // Format and store the IP address as a string
-            snprintf((char *)wrBuf, sizeof(wrBuf), "%u.%u.%u.%u", octet1, octet2, octet3, octet4);
-            printf("IP Address Stored: %s\n", ip_addr);
-        } else {
-            printf("Error: One or more octets are out of range (0-255).\n");
-        }
-    } else
-        printf("Error: Invalid input format. Please enter in x.x.x.x format.\n");
-
-
-  printf("  Writing");
-  for (size_t loc = 0; loc < 128; loc += 16)
-  {
-    i2c_eeprom_writeBytes(loc, &wrBuf[loc], 16);
-    printf(".");
-    usleep(10*1000);
-  }
-  printf("\r\n");
-}
-*/
 
 
 
