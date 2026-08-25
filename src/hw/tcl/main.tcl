@@ -26,6 +26,26 @@ proc setSources {} {
   lappend Sources {"../hdl/ltc2107_spi.vhd" "VHDL 2008"} 
   
   lappend Sources {"../hdl/adc_data_rdout.vhd" "VHDL 2008"} 
+  
+  lappend Sources {"../hdl/adc_samplenum.vhd" "VHDL 2008"} 
+  lappend Sources {"../hdl/startup_dly.vhd" "VHDL 2008"} 
+  lappend Sources {"../hdl/gen_test_pulses.vhd" "VHDL 2008"}  
+  lappend Sources {"../hdl/livetime.vhd" "VHDL 2008"}  
+  lappend Sources {"../hdl/timing_events.vhd" "VHDL 2008"}        
+  lappend Sources {"../hdl/beam_detect_window.vhd" "VHDL 2008"}  
+  lappend Sources {"../hdl/pulse_gen.vhd" "VHDL 2008"} 
+  
+  lappend Sources {"../hdl/calc_charge.vhd" "VHDL 2008"} 
+  lappend Sources {"../hdl/calc_beam_stats.vhd" "VHDL 2008"}   
+  lappend Sources {"../hdl/calc_baseline.vhd" "VHDL 2008"}  
+  lappend Sources {"../hdl/calc_fwhm.vhd" "VHDL 2008"}   
+  lappend Sources {"../hdl/calc_integral.vhd" "VHDL 2008"} 
+  lappend Sources {"../hdl/find_peak.vhd" "VHDL 2008"} 
+  lappend Sources {"../hdl/gen_gates.vhd" "VHDL 2008"}   
+  lappend Sources {"../hdl/find_beam_oow.vhd" "VHDL 2008"}    
+  lappend Sources {"../hdl/gen_gate.vhd" "VHDL 2008"} 
+  lappend Sources {"../hdl/find_boow_pulse.vhd" "VHDL 2008"} 
+  
 
   lappend Sources {"../hdl/stretch.vhd" "VHDL 2008"} 
   lappend Sources {"../hdl/sync_cdc.vhd" "VHDL 2008"}   
@@ -72,7 +92,8 @@ proc doOnCreate {} {
   source ${TclPath}/system.tcl
   source ${TclPath}/wvfm_fifo.tcl
   source ${TclPath}/evr_gth.tcl
-
+  source ${TclPath}/adc_shift_ram.tcl
+  source ${TclPath}/boow_shift_ram.tcl
 
   addSources "Sources" 
   

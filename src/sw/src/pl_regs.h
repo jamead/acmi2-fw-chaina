@@ -172,20 +172,17 @@
 /* Pulse statistics convenience definitions                                  */
 /* ------------------------------------------------------------------------- */
 
-#define PULSE_STATS_BASE_OFFSET                0x400U
-#define PULSE_STATS_NUM_PULSES                 5U
-#define PULSE_STATS_REGS_PER_PULSE             7U
-#define PULSE_STATS_NUM_REGS                   35U
+#define PULSE_STATS_BASE_REG                   0x400U
 #define PULSE_STATS_STRIDE                     0x01CU
-#define PULSE_STATS_SIZE_BYTES                 140U
 
-#define PULSE_STATS_BASELINE_FIELD_OFFSET      0x00U
-#define PULSE_STATS_INTEGRAL_FIELD_OFFSET      0x04U
-#define PULSE_STATS_PEAK_FIELD_OFFSET          0x08U
-#define PULSE_STATS_PEAK_INDEX_FIELD_OFFSET    0x0CU
-#define PULSE_STATS_PEAK_FOUND_FIELD_OFFSET    0x10U
-#define PULSE_STATS_THRESHOLD_FIELD_OFFSET     0x14U
-#define PULSE_STATS_FWHM_FIELD_OFFSET          0x18U
+
+#define PULSE_STATS_BASELINE_OFFSET            0x00U
+#define PULSE_STATS_INTEGRAL_OFFSET            0x04U
+#define PULSE_STATS_PEAK_OFFSET                0x08U
+#define PULSE_STATS_PEAK_INDEX_OFFSET          0x0CU
+#define PULSE_STATS_PEAK_FOUND_OFFSET          0x10U
+#define PULSE_STATS_THRESHOLD_OFFSET           0x14U
+#define PULSE_STATS_FWHM_OFFSET                0x18U
 
 #define PULSE_STATS_BASELINE_MASK              0x0000FFFFU
 #define PULSE_STATS_INTEGRAL_MASK              0xFFFFFFFFU

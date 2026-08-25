@@ -78,40 +78,41 @@ end top;
 architecture behv of top is
 
   
-  signal pl_clk0         : std_logic;
-  signal pl_clk1         : std_logic;
-  signal adc_clk         : std_logic;
-  signal pl_resetn       : std_logic;
-  signal pl_reset        : std_logic;
-  signal ps_leds         : std_logic_vector(7 downto 0);
+  signal pl_clk0            : std_logic;
+  signal pl_clk1            : std_logic;
+  signal adc_clk            : std_logic;
+  signal pl_resetn          : std_logic;
+  signal pl_reset           : std_logic;
+  signal ps_leds            : std_logic_vector(7 downto 0);
   
-  signal m_axi4_m2s      : t_pl_regs_m2s;
-  signal m_axi4_s2m      : t_pl_regs_s2m;
+  signal m_axi4_m2s         : t_pl_regs_m2s;
+  signal m_axi4_s2m         : t_pl_regs_s2m;
   
+  signal adc_data           : std_logic_vector(15 downto 0); 
 
-  signal adc_data        : std_logic_vector(15 downto 0); 
+  signal reg_o_adcfifo      : t_reg_o_adc_fifo_rdout;
+  signal reg_i_adcfifo      : t_reg_i_adc_fifo_rdout;
+  signal reg_o_adc          : t_reg_o_adc_cntrl;
+  signal reg_i_adc          : t_reg_i_adc_status; 
+  signal reg_i_trig         : t_reg_i_trig;
+  signal reg_o_evr          : t_reg_o_evr;
+  signal reg_i_evr          : t_reg_i_evr;
+  signal reg_o_eeprom       : t_reg_o_eeprom;
+  signal reg_i_pulsestats   : t_reg_i_pulse_stats_array;
 
- 
-  signal reg_o_adcfifo   : t_reg_o_adc_fifo_rdout;
-  signal reg_i_adcfifo   : t_reg_i_adc_fifo_rdout;
-  signal reg_o_adc       : t_reg_o_adc_cntrl;
-  signal reg_i_adc       : t_reg_i_adc_status; 
-  signal reg_i_trig      : t_reg_i_trig;
+  signal adc_samplenum      : std_logic_vector(31 downto 0);
+  signal beam_detect_window : std_logic;
+  signal beam_cycle_window  : std_logic;
+  signal fault_startup      : std_logic;
+  signal live_time          : std_logic_vector(31 downto 0);
+  signal startup_cnt        : std_logic_vector(31 downto 0);
 
-  signal reg_o_evr       : t_reg_o_evr;
-  signal reg_i_evr       : t_reg_i_evr;
-  
-  signal reg_o_eeprom    : t_reg_o_eeprom;
-  signal reg_i_pulsestats: t_reg_i_pulse_stats_array;
 
-  signal sa_trig         : std_logic;
-  signal sa_trig_stretch : std_logic;
-
-  signal evr_gps_trig    : std_logic;
-  signal evr_trig        : std_logic;  
-  signal evr_ts          : std_logic_vector(63 downto 0); 
-  signal evr_rcvd_clk    : std_logic;
-  signal evr_ref_clk     : std_logic;
+  signal evr_gps_trig       : std_logic;
+  signal evr_trig           : std_logic;  
+  signal evr_ts             : std_logic_vector(63 downto 0); 
+  signal evr_rcvd_clk       : std_logic;
+  signal evr_ref_clk        : std_logic;
 
   
   signal ioc_access_led  : std_logic;
@@ -135,13 +136,13 @@ afe_pwrenb <= '1';
 
 dbg(0) <= pl_clk0;
 dbg(1) <= '0'; 
-dbg(2) <= '0';  --psdone 
+dbg(2) <= '0';  
 dbg(3) <= '0';
-dbg(4) <= '0'; -- adc_fco_bufg 
-dbg(5) <= '0'; --adc_fco_mmcm 
-dbg(6) <= '0'; --gth_refclk_buf; --'0';
-dbg(7) <= '0'; --gth_txusr_clk;
-dbg(8) <= '0'; --gth_rxusr_clk;
+dbg(4) <= '0';  
+dbg(5) <= '0'; 
+dbg(6) <= '0'; 
+dbg(7) <= '0'; 
+dbg(8) <= '0'; 
 dbg(9) <= '0';
 dbg(10) <= '0';
 dbg(11) <= '0';
@@ -164,35 +165,44 @@ fp_led(7) <= '0';
 fp_led(6) <= '0'; 
 fp_led(5) <= '0'; 
 fp_led(4) <= '0'; 
-fp_led(3) <= '0'; --not ad9510_status;
+fp_led(3) <= '0'; 
 fp_led(2) <= ioc_access_led; 
 fp_led(1) <= '0';
-fp_led(0) <= sa_trig_stretch;
+fp_led(0) <= '0';
 
 sfp_led(0) <= evr_gps_trig;
 sfp_led(11 downto 1) <= (others => '0');
 
+fault_led <= (others => '0');
 
 
 pl_reset <= not pl_resetn;
 
 
-fault_led <= (others => toggle_reg);
 
-process(pl_clk0)
-  begin
-    if rising_edge(pl_clk0) then
-       if pl_reset = '1' then
-          count      <= 0;
-          toggle_reg <= '0';
-       elsif count = 100000000 then
-          count      <= 0;
-          toggle_reg <= not toggle_reg;
-       else
-          count <= count + 1;
-       end if;
-     end if;
- end process;
+
+
+
+
+
+timing: entity work.timing_events
+  port map(
+    clk => adc_clk,
+    reset => pl_reset,
+    trig => evr_trig, 
+    eeprom_params => reg_o_eeprom, 
+    keylock => keylock,    
+    beam_detect_window => beam_detect_window,
+    beam_cycle_window => beam_cycle_window,
+    adc_samplenum => adc_samplenum,
+    tp_pos_pulse => tp_pos_pulse,
+    tp_neg_pulse => tp_neg_pulse,
+    live_time => live_time, 
+    startup_cnt => startup_cnt, 
+    fault_startup => fault_startup
+ );
+
+
 
 
 
@@ -216,10 +226,41 @@ adc : entity work.adc_interface
     adc_of_n => adc_of_n,
     adc_data_lut => 16d"0",  --adc_data_lut,
     adc_data_corr => adc_data,
-    adc_data_ob => open, --dac_data,
+    adc_data_ob => open, 
     adc_clk => adc_clk,
-    adc_sat => open --adc_sat
+    adc_sat => open  --adc_sat
   );
+
+
+-- calculates all metrics on beam and test pulses
+calc_q: entity work.calc_charge
+  port map (
+   clk => adc_clk,
+   trig => evr_trig,
+   adc_samplenum => adc_samplenum,
+   params => reg_o_eeprom,              
+   adc_data_raw => adc_data, 
+   adc_data_inv_dly => open, --adc_data_dly, 
+   pulse_stats => reg_i_pulsestats  
+  );    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 -- push 16k samples to FIFO on trigger
@@ -233,10 +274,6 @@ wvfm_fifo: entity work.adc_data_rdout
     reg_i => reg_i_adcfifo,
     adc_data => adc_data
  );
-
-
-
-
 
 
 
@@ -267,7 +304,7 @@ evr: entity work.evr_top
     trigdly => (x"00000001"), 
     tbt_trig => open,  
     fa_trig => open,  
-    sa_trig => sa_trig, 
+    sa_trig => open,  
     usr_trig => evr_trig, 
     gps_trig => evr_gps_trig, 
     timestamp => evr_ts,  
@@ -330,14 +367,14 @@ system_i: component system
 
 
 --stretch the sa_trig signal so can be seen on LED
-sa_led : entity work.stretch
-  port map (
-	clk => adc_clk,
-	reset => pl_reset, 
-	sig_in => sa_trig, 
-	len => 3000000, -- ~25ms;
-	sig_out => sa_trig_stretch
-);	  	
+--sa_led : entity work.stretch
+--  port map (
+--	clk => adc_clk,
+--	reset => pl_reset, 
+--	sig_in => sa_trig, 
+--	len => 3000000, -- ~25ms;
+--	sig_out => sa_trig_stretch
+--);	  	
 
 --stretch the sa_trig signal so can be seen on LED
 --pscmsg_led : entity work.stretch

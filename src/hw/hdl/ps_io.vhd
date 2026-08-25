@@ -143,7 +143,6 @@ reg_o_eeprom.crc32_eeprom <= reg_o.crc_eeprom.val.data;
 
 
 -- Pulse Statistics
-
 reg_i.pulse0_baseline.val.data <= reg_i_pulsestats(0).baseline;
 reg_i.pulse0_integral.val.data <= reg_i_pulsestats(0).integral;
 reg_i.pulse0_peak.val.data <= reg_i_pulsestats(0).peak;
