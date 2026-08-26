@@ -75,25 +75,25 @@ reg_i.fifo_rdcnt <= 16d"0" & fifo_rdcnt;
         
 
 -- sync trig to adc clock domain
-process (adc_clk)
-begin
-  if (rising_edge(adc_clk)) then
-	if (sys_rst = '1') then
-	  trig_sr <= "000";
-	  trig_s  <= '0';
-    else
-      trig_sr(0) <= trig;
-      trig_sr(1) <= trig_sr(0);
-      trig_sr(2) <= trig_sr(1);
+--process (adc_clk)
+--begin
+--  if (rising_edge(adc_clk)) then
+--	if (sys_rst = '1') then
+--	  trig_sr <= "000";
+--	  trig_s  <= '0';
+--    else
+--      trig_sr(0) <= trig;
+--      trig_sr(1) <= trig_sr(0);
+--      trig_sr(2) <= trig_sr(1);
 
-      if (trig_sr(2) = '0' and trig_sr(1) = '1') then
-        trig_s <= '1';
-      else
-        trig_s <= '0';
-      end if;
-    end if;
-  end if;
-end process;
+--      if (trig_sr(2) = '0' and trig_sr(1) = '1') then
+--        trig_s <= '1';
+--      else
+--        trig_s <= '0';
+--      end if;
+--    end if;
+--  end if;
+--end process;
 
 
 
@@ -109,7 +109,7 @@ begin
         when IDLE =>
           sample_num <= (others => '0');
 
-          if trig_s = '1' then
+          if trig = '1' then
             state <= WR_FIFO;
           end if;
 

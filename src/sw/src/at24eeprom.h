@@ -80,23 +80,10 @@ typedef struct {
 
 
 
-typedef struct {
-    uint32_t baseline;
-    uint32_t integral;
-    uint32_t peak;
-    uint32_t peak_index;
-    uint32_t peak_found;
-    uint32_t threshold;
-    uint32_t fwhm;
-} pulse_stats_t;
-
-typedef struct {
-    pulse_stats_t pulse[5];
-} pulse_stats_msg_t;
 
 
 
-#endif /* PSC_MESSAGES_H */
+#endif
 
 
 

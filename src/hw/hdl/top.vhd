@@ -289,6 +289,7 @@ evr: entity work.evr_top
   )
   port map(
     sys_clk => pl_clk0,
+    adc_clk => adc_clk,
     sys_rst => pl_reset,
     reg_o => reg_o_evr,
     --gth_reset => gth_reset,
@@ -305,7 +306,7 @@ evr: entity work.evr_top
     tbt_trig => open,  
     fa_trig => open,  
     sa_trig => open,  
-    usr_trig => evr_trig, 
+    usr_trig_s => evr_trig, 
     gps_trig => evr_gps_trig, 
     timestamp => evr_ts,  
     evr_rcvd_clk => evr_rcvd_clk

@@ -22,6 +22,7 @@ entity evr_top is
   );
   port (
   sys_clk        : in std_logic;
+  adc_clk        : in std_logic;
   sys_rst        : in std_logic;
   reg_o          : in t_reg_o_evr;
   --gth_reset      : in std_logic_vector(7 downto 0);
@@ -39,7 +40,7 @@ entity evr_top is
   tbt_trig       : out std_logic;
   fa_trig        : out std_logic;
   sa_trig        : out std_logic;
-  usr_trig       : out std_logic;
+  usr_trig_s     : out std_logic;
   gps_trig       : out std_logic;
   timestamp      : out std_logic_vector(63 downto 0);
     
@@ -165,6 +166,7 @@ end component;
    signal cnt               : integer range 255 downto 0;
    signal trigactive        : std_logic;
    signal dma_trigno        : std_logic_vector(7 downto 0);
+   signal usr_trig          : std_logic;
   
   
   
@@ -194,6 +196,20 @@ end component;
 
 
 begin 
+
+
+-- sync the usr_trig to the adc clock domain
+u_sync_cdc : entity work.sync_cdc
+  port map (
+    clk   => adc_clk,
+    reset => sys_rst,
+    din   => usr_trig,
+    dout  => open,
+    rise  => usr_trig_s
+  );
+
+
+
 
 evr_rcvd_clk <= gth_rxusr_clk;
 
@@ -441,7 +457,7 @@ event_usr : entity work.event_rcv_chan  --EventReceiverChannel
        eventstream => eventstream,
        myevent => dma_trigno, --reg_o.dma_trigno, --trignum,
        mydelay => trigdly, 
-       mywidth => (x"00000175"),   -- //creates a pulse about 3us long
+       mywidth => 32d"8",   -- //creates a pulse about 64ns long
        mypolarity => ('0'),
        trigger => usr_trig
 );

@@ -15,40 +15,45 @@
 
 #include "pl_regs.h"
 #include "wvfmdata.h"
+#include "pulse_stats.h"
 
 
-void PulseStatsGatherData(pulse_stats_msg_t *stats)
+static uint32_t trigger_count = 0;
+
+
+void PulseStatsGatherData(pulse_stats_msg_t *data)
 {
     uint32_t addr;
 
-    for (unsigned i = 0; i < 5; i++) {
+    if (data == NULL)
+        return;
 
-        addr = XPAR_M_AXI_BASEADDR +
-               PULSE_STATS_BASE_REG +
-               (i * PULSE_STATS_STRIDE);
+    data->header  = 0x8000; //REG_READ(HEADER_REG);
+    data->fpgaver = 123; //REG_READ(FPGAVER_REG);
 
-        stats->pulse[i].baseline =
-            Xil_In32(addr + PULSE_STATS_BASELINE_OFFSET);
+    for (uint32_t i = 0; i < NUM_PULSES; i++) {
 
-        stats->pulse[i].integral =
-            Xil_In32(addr + PULSE_STATS_INTEGRAL_OFFSET);
+        addr = PULSE_STATS_BASE_REG + (i * PULSE_STATS_STRIDE);
 
-        stats->pulse[i].peak =
-            Xil_In32(addr + PULSE_STATS_PEAK_OFFSET);
-
-        stats->pulse[i].peak_index =
-            Xil_In32(addr + PULSE_STATS_PEAK_INDEX_OFFSET);
-
-        stats->pulse[i].peak_found =
-            Xil_In32(addr + PULSE_STATS_PEAK_FOUND_OFFSET);
-
-        stats->pulse[i].threshold =
-            Xil_In32(addr + PULSE_STATS_THRESHOLD_OFFSET);
-
-        stats->pulse[i].fwhm =
-            Xil_In32(addr + PULSE_STATS_FWHM_OFFSET);
+        data->pulse[i].baseline   = (int32_t)(int16_t)REG_READ(addr + PULSE_STATS_BASELINE_OFFSET);
+        xil_printf("%d: baseline: %d\r\n",i,data->pulse[i].baseline);
+        data->pulse[i].peak       = REG_READ(addr + PULSE_STATS_PEAK_OFFSET);
+        data->pulse[i].integral   = REG_READ(addr + PULSE_STATS_INTEGRAL_OFFSET);
+        data->pulse[i].fwhm       = REG_READ(addr + PULSE_STATS_FWHM_OFFSET);
+        data->pulse[i].peak_index = REG_READ(addr + PULSE_STATS_PEAK_INDEX_OFFSET);
     }
+
+    data->faults_live_raw      = 0; //REG_READ(FAULTS_LIVE_RAW_REG);
+    data->faults_lat           = 0; //REG_READ(FAULTS_LAT_REG);
+    data->trig_cnt             = trigger_count; //REG_READ(TRIG_CNT_REG);
+    data->accum                = 0; //REG_READ(ACCUM_REG);
+    data->acis                 = 0; //REG_READ(ACIS_REG);
+    data->crc_artix            = 0; //REG_READ(CRC_ARTIX_REG);
+    data->faults_tp            = 0; //REG_READ(FAULTS_TP_REG);
+    data->startup_cnt          = 0; //REG_READ(STARTUP_CNT_REG);
+    data->beamaccum_limit_calc = 0; //REG_READ(BEAMACCUM_LIMIT_CALC_REG);
 }
+
 
 
 static void send_adc_waveform(void)
@@ -57,7 +62,9 @@ static void send_adc_waveform(void)
 
     for (uint32_t i = 0; i < WVFM_NUM_SAMPLES; i++) {
         int16_t sample = (int16_t)REG_READ(ADCFIFO_DATA_REG);
-        wvfm_adc[i] = (int16_t)htons((uint16_t)sample);
+        //if (i<100)
+		//  xil_printf("%d:  %d\r\n",i,sample);
+        wvfm_adc[i] = (int16_t)htons((int16_t)sample);
     }
 
     psc_send(the_server,
@@ -93,6 +100,10 @@ static uint32_t wait_for_adc_fifo(uint32_t debug)
         vTaskDelay(pdMS_TO_TICKS(100));
 
     } while (wordcnt < 8000);
+
+    xil_printf("Got Trigger!\r\n");
+
+    trigger_count++;
 
     return wordcnt;
 }
@@ -174,8 +185,8 @@ static void wvfmdata_push(void *unused)
         uint32_t wordcnt = wait_for_adc_fifo(debug);
 
         if (wordcnt > WVFM_FIFO_MIN_WORDS) {
-            send_pulse_stats();
             send_adc_waveform();
+        	send_pulse_stats();
             send_timestamp();
         }
 
