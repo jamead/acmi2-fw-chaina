@@ -46,6 +46,10 @@ proc setSources {} {
   lappend Sources {"../hdl/gen_gate.vhd" "VHDL 2008"} 
   lappend Sources {"../hdl/find_boow_pulse.vhd" "VHDL 2008"} 
   
+  lappend Sources {"../hdl/accumulator.vhd" "VHDL 2008"} 
+  
+  lappend Sources {"../hdl/faults.vhd" "VHDL 2008"} 
+  
 
   lappend Sources {"../hdl/stretch.vhd" "VHDL 2008"} 
   lappend Sources {"../hdl/sync_cdc.vhd" "VHDL 2008"}   
@@ -94,6 +98,7 @@ proc doOnCreate {} {
   source ${TclPath}/evr_gth.tcl
   source ${TclPath}/adc_shift_ram.tcl
   source ${TclPath}/boow_shift_ram.tcl
+  source ${TclPath}/accum_dpram.tcl
 
   addSources "Sources" 
   

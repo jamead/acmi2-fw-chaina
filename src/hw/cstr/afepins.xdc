@@ -75,17 +75,30 @@ set_property IOSTANDARD LVCMOS18 [get_ports {fault_led[*]}]
 # ------------------------------------------------------------------------------
 # Test pulser interface - HD Banks 49/50 (3.3 V)
 # ------------------------------------------------------------------------------
-set_property PACKAGE_PIN E15 [get_ports {tp_neg_pulse[0]}]
-set_property PACKAGE_PIN A16 [get_ports {tp_neg_pulse[1]}]
-set_property PACKAGE_PIN A15 [get_ports {tp_neg_pulse[2]}]
-set_property PACKAGE_PIN B15 [get_ports {tp_neg_pulse[3]}]
-set_property PACKAGE_PIN A13 [get_ports {tp_neg_pulse[4]}]
+#set_property PACKAGE_PIN E15 [get_ports {tp_neg_pulse[0]}]
+#set_property PACKAGE_PIN A16 [get_ports {tp_neg_pulse[1]}]
+#set_property PACKAGE_PIN A15 [get_ports {tp_neg_pulse[2]}]
+#set_property PACKAGE_PIN B15 [get_ports {tp_neg_pulse[3]}]
+#set_property PACKAGE_PIN A13 [get_ports {tp_neg_pulse[4]}]
 
-set_property PACKAGE_PIN C13 [get_ports {tp_pos_pulse[0]}]
-set_property PACKAGE_PIN G16 [get_ports {tp_pos_pulse[1]}]
-set_property PACKAGE_PIN B16 [get_ports {tp_pos_pulse[2]}]
-set_property PACKAGE_PIN A12 [get_ports {tp_pos_pulse[3]}]
-set_property PACKAGE_PIN B13 [get_ports {tp_pos_pulse[4]}]
+#set_property PACKAGE_PIN C13 [get_ports {tp_pos_pulse[0]}]
+#set_property PACKAGE_PIN G16 [get_ports {tp_pos_pulse[1]}]
+#set_property PACKAGE_PIN B16 [get_ports {tp_pos_pulse[2]}]
+#set_property PACKAGE_PIN A12 [get_ports {tp_pos_pulse[3]}]
+#set_property PACKAGE_PIN B13 [get_ports {tp_pos_pulse[4]}]
+
+#cable orientation backwards
+set_property PACKAGE_PIN B13 [get_ports {tp_neg_pulse[0]}]
+set_property PACKAGE_PIN A12 [get_ports {tp_neg_pulse[1]}]
+set_property PACKAGE_PIN B16 [get_ports {tp_neg_pulse[2]}]
+set_property PACKAGE_PIN G16 [get_ports {tp_neg_pulse[3]}]
+set_property PACKAGE_PIN C13 [get_ports {tp_neg_pulse[4]}]
+
+set_property PACKAGE_PIN A13 [get_ports {tp_pos_pulse[0]}]
+set_property PACKAGE_PIN B15 [get_ports {tp_pos_pulse[1]}]
+set_property PACKAGE_PIN A15 [get_ports {tp_pos_pulse[2]}]
+set_property PACKAGE_PIN A16 [get_ports {tp_pos_pulse[3]}]
+set_property PACKAGE_PIN E15 [get_ports {tp_pos_pulse[4]}]
 
 set_property IOSTANDARD LVCMOS33 [get_ports {{tp_neg_pulse[*]} {tp_pos_pulse[*]}}]
 
@@ -110,7 +123,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports eeprom_sdo]
 # ------------------------------------------------------------------------------
 # Relay board interface - HD Bank 50 (3.3 V)
 # ------------------------------------------------------------------------------
-set_property PACKAGE_PIN J12 [get_ports faultn]
+set_property PACKAGE_PIN J12 [get_ports fault]
 set_property PACKAGE_PIN H14 [get_ports faultn_rdbk]
 set_property PACKAGE_PIN E10 [get_ports fault_rst]
 set_property PACKAGE_PIN G11 [get_ports force_trig]
@@ -122,7 +135,7 @@ set_property PACKAGE_PIN F11 [get_ports {spare[2]}]
 set_property PACKAGE_PIN J14 [get_ports {spare[3]}]
 set_property PACKAGE_PIN J16 [get_ports {spare[4]}]
 
-set_property IOSTANDARD LVCMOS33 [get_ports {faultn faultn_rdbk fault_rst force_trig keylock {spare[*]}}]
+set_property IOSTANDARD LVCMOS33 [get_ports {fault faultn_rdbk fault_rst force_trig keylock {spare[*]}}]
 
 # ------------------------------------------------------------------------------
 # AFE power management - HD Bank 50 (3.3 V)

@@ -14,7 +14,6 @@ use xil_defaultlib.acmi_package.ALL;
 
 entity top is
 generic(
-    FPGA_VERSION			: integer := 9;
     SIM_MODE				: integer := 0
     );
   port (  
@@ -45,7 +44,7 @@ generic(
     fault_led               : out std_logic_vector(15 downto 0);
     
     --relay board interface
-    faultn                  : out std_logic;
+    fault                   : out std_logic;
     faultn_rdbk             : in std_logic;
     fault_rst               : out std_logic;
     force_trig              : out std_logic;
@@ -89,6 +88,7 @@ architecture behv of top is
   signal m_axi4_s2m         : t_pl_regs_s2m;
   
   signal adc_data           : std_logic_vector(15 downto 0); 
+  signal adc_sat            : std_logic;
 
   signal reg_o_adcfifo      : t_reg_o_adc_fifo_rdout;
   signal reg_i_adcfifo      : t_reg_i_adc_fifo_rdout;
@@ -106,6 +106,10 @@ architecture behv of top is
   signal fault_startup      : std_logic;
   signal live_time          : std_logic_vector(31 downto 0);
   signal startup_cnt        : std_logic_vector(31 downto 0);
+  
+  signal accum              : std_logic_vector(31 downto 0);
+  
+  signal faults_rdbk        : std_logic_vector(15 downto 0);
 
 
   signal evr_gps_trig       : std_logic;
@@ -156,7 +160,7 @@ dbg(18) <= '0';
 dbg(19) <= '0';
 
 
-fp_out(0) <= '0';
+fp_out(0) <= evr_trig; 
 fp_out(1) <= '0'; 
 fp_out(2) <= '0'; 
 fp_out(3) <= '0'; 
@@ -228,7 +232,7 @@ adc : entity work.adc_interface
     adc_data_corr => adc_data,
     adc_data_ob => open, 
     adc_clk => adc_clk,
-    adc_sat => open  --adc_sat
+    adc_sat => adc_sat
   );
 
 
@@ -246,18 +250,47 @@ calc_q: entity work.calc_charge
 
 
 
+-- 15 min charge accumulator
+boxcar: entity work.accumulator
+  port map(
+    clk => adc_clk, 
+    rst => pl_reset, --cntrl_params.accum_reset, 
+    accum_len => reg_o_eeprom.accum_length(12 downto 0),
+    beam_detect_window => beam_detect_window, 
+    q_min => reg_o_eeprom.accum_q_min,
+    sample => reg_i_pulsestats(0).integral,
+    --charge_oow => charge_oow,
+    accum => accum
+);
 
 
 
+-- generate fault conditions
+gen_faults: entity work.faults
+  port map (
+    clk => adc_clk,
+    reset => pl_reset,
+    beam_cycle_window => beam_cycle_window,
+    trig => evr_trig,
+    params => reg_o_eeprom,
+    pulse_stats => reg_i_pulsestats, 
+    accum => accum, 
+    fault_startup => fault_startup,   
+    fault_bad_power => '0', --fault_bad_power,
+    fault_no_clock => '0', --fault_no_clock, 
+    fault_no_pulse => '0', --fault_no_pulse, 
+    fault_no_trigger => '0', --fault_no_trigger,
+    acis_faultn => '0', --acis_faultn,
+    acis_fault_rdbk => '0', --acis_fault_rdbk,
+    acis_reset => '0',  --acis_reset_debounced, 
+    acis_force_trip => '0', --acis_force_trip_debounced,
+    acis_keylock => '0', --acis_keylock_debounced,       
+    acis_readbacks => open,  --acis_readbacks,
+    adc_sat => adc_sat,
+    fault => fault,
+    faults_rdbk => faults_rdbk
 
-
-
-
-
-
-
-
-
+);
 
 
 
